@@ -22,9 +22,22 @@ import com.cmi.database.EPointJDBC;
 
 @Path("/epoint")
 public class EPointService {
-    private String url = "jdbc:postgresql://172.17.0.3/cmi";
-    private String user = "postgres";
-    private String password = "1234";
+    private String url;
+    private String user;
+    private String password;
+    private EPointJDBC pjdbc;
+    public EPointService() {
+	url = "jdbc:postgresql://172.17.0.3/cmi";
+	user = "postgres";
+	password = "1234";
+	try {
+	    pjdbc = new EPointJDBC(url, user, password);
+	} catch (ClassNotFoundException e) {
+	    // TO DO
+	} catch (SQLException e) {
+	    // TO DO
+	}
+    }
     @GET
     @Path("/get")
     @Produces(MediaType.APPLICATION_JSON)
@@ -42,16 +55,12 @@ public class EPointService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEPointList() {
 	try {
-	    EPointJDBC pjdbc = new EPointJDBC(url, user, password);
 	    ArrayList<EPoint> array = pjdbc.getAllEPoints();
 	    return Response.ok(array).build();
-	} catch (ClassNotFoundException e) {
-	    // TO DO
 	} catch (SQLException e) {
 	    // TO DO
 	}
-	return Response.ok(new ArrayList<EPoint>()).build();
-	
+	return Response.status(200).entity(new ArrayList<EPoint>()).build();
     }
     @POST
     @Path("/add")
