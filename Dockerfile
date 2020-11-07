@@ -34,14 +34,11 @@ RUN set -x \
 #HTTP port
 EXPOSE 8080
 
-# Create a jersey artifact from Maven, package, and deploy the war on tomcat
-RUN mvn archetype:generate -DarchetypeArtifactId=jersey-quickstart-webapp \
-                -DarchetypeGroupId=org.glassfish.jersey.archetypes -DinteractiveMode=false \
-                -DgroupId=com.example -DartifactId=jerseyapp -Dpackage=com.example \
-                -DarchetypeVersion=2.19 && \
-    cd jerseyapp && mvn package -DskipTests && \
-    mv target/jerseyapp.war /usr/local/tomcat/webapps && \
-    rm -rf ~/jerseyapp
-
+ADD cmi ${CATALINA_HOME}/cmi
+WORKDIR ${CATALINA_HOME}/cmi
+RUN mvn clean package && \
+	cp -r target/cmi ${CATALINA_HOME}/webapps/. && \
+	cp target/cmi.war ${CATALINA_HOME}/webapps/.
+ 
 # Start Tomcat
 CMD ["/usr/local/tomcat/bin/catalina.sh", "run"]
