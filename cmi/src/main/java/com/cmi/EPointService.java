@@ -68,6 +68,11 @@ public class EPointService {
     public Response addEPointHandler(EPoint point) {
 	String result = "energy point added successfully : " + point.getPointTag();
 	// write code to add energy point into db or in-memory.
+	try {
+	    pjdbc.addEPoint(point);
+	} catch (SQLException e) {
+	    // TO DO
+	}
 	return Response.status(201).entity(result).build();
     }
 }
