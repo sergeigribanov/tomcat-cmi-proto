@@ -6,6 +6,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,7 +28,7 @@ public class EPointService {
     private String password;
     private EPointJDBC pjdbc;
     public EPointService() {
-	url = "jdbc:postgresql://172.17.0.3/cmi";
+	url = "jdbc:postgresql://172.16.238.11/cmi";
 	user = "postgres";
 	password = "1234";
 	try {
@@ -39,24 +40,36 @@ public class EPointService {
 	}
     }
     @GET
-    @Path("/get")
+    @Path("/{pointTag}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getEPointJSONHandler() {
-	EPoint pt = new EPoint();
-	pt.setExpTag("HIGH2017");
-	pt.setPointTag("800_40142");
-	pt.setBeamEnergy(800.3);
-	pt.setBeamEnergyError(0.5);
-	pt.setMagneticField(1.3);
-	return Response.status(200).entity(pt).build();
+    public Response getEPointJSONHandler(@PathParam("pointTag") String pointTag) {
+	try {
+	    EPoint pt = pjdbc.getEPoint(pointTag);
+	    return Response.status(200).entity(pt).build();
+	} catch (SQLException e) {
+	    // TO DO
+	}
+	return Response.status(200).entity(new EPoint()).build(); // TO DO : remove !!!
     }
     @GET
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEPointList() {
 	try {
-	    ArrayList<EPoint> array = pjdbc.getAllEPoints();
-	    return Response.ok(array).build();
+	    ArrayList<EPoint> array = pjdbc.getListOfEPoints();
+	    return Response.status(200).entity(array).build();
+	} catch (SQLException e) {
+	    // TO DO
+	}
+	return Response.status(200).entity(new ArrayList<EPoint>()).build();
+    }
+    @GET
+    @Path("/list/{expTag}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getEPointList(@PathParam("expTag") String expTag) {
+	try {
+	    ArrayList<EPoint> array = pjdbc.getListOfEPoints(expTag);
+	    return Response.status(200).entity(array).build();
 	} catch (SQLException e) {
 	    // TO DO
 	}

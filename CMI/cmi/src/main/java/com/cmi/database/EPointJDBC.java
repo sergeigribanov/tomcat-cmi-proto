@@ -57,17 +57,27 @@ public class EPointJDBC implements EPointDAO{
     }
 
     public EPoint getEPoint(String pointTag) throws SQLException {
-	//get all epoints
-	ArrayList<EPoint> array = getAllEPoints();
-	for (EPoint epoint : array) {
-	    if(epoint.getPointTag().equals(pointTag)) {
-		return epoint;
-	    }
+	String sql = "select * from epoints where ptag = ?";
+	PreparedStatement ps = this.connection.prepareStatement(sql);
+	ps.setString(1, pointTag);
+	ResultSet result = ps.executeQuery();
+	while(result.next()) {
+	    //new EPoint
+	    EPoint epoint = new EPoint();
+	    //get column of name
+	    epoint.setPointTag(result.getString("ptag"));
+	    epoint.setExpTag(result.getString("etag"));
+	    epoint.setBeamEnergy(result.getDouble("ebeam"));
+	    epoint.setBeamEnergyError(result.getDouble("ebeam_err"));
+	    epoint.setMagneticField(result.getDouble("mfield"));
+	    result.close();
+	    return epoint;
 	}
+	
 	return null;
     }
 
-    public ArrayList<EPoint> getAllEPoints() throws SQLException {
+    public ArrayList<EPoint> getListOfEPoints() throws SQLException {
 	ArrayList<EPoint> array = new ArrayList<EPoint>();
 	//get all epoints
 	//query of postgresql
@@ -85,6 +95,27 @@ public class EPointJDBC implements EPointDAO{
 	}
 	result.close();
 	return array;
-	
+    }
+    public ArrayList<EPoint> getListOfEPoints(String expTag) throws SQLException {
+	ArrayList<EPoint> array = new ArrayList<EPoint>();
+	//get all epoints
+	//query of postgresql
+	String sql = "select * from epoints where etag = ?";
+	PreparedStatement ps = this.connection.prepareStatement(sql);
+	ps.setString(1, expTag);
+	ResultSet result = ps.executeQuery();
+	while(result.next()) {
+	    //new EPoint
+	    EPoint epoint = new EPoint();
+	    //get column of name
+	    epoint.setPointTag(result.getString("ptag"));
+	    epoint.setExpTag(result.getString("etag"));
+	    epoint.setBeamEnergy(result.getDouble("ebeam"));
+	    epoint.setBeamEnergyError(result.getDouble("ebeam_err"));
+	    epoint.setMagneticField(result.getDouble("mfield"));
+	    array.add(epoint);
+	}
+	result.close();
+	return array;
     }
 }

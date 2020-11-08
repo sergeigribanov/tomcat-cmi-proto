@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  cmi:
+    build: CMI/
+    ports:
+      - "8081:8080"
+    networks:
+      cmi_net:
+        ipv4_address: 172.16.238.10
+
+  postgresqldb:
+    build: database/postgresql
+    ports:
+      - "5432:5432"
+    networks:
+      cmi_net:
+        ipv4_address: 172.16.238.11
+    
+  
+networks:
+  cmi_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.238.0/24"

@@ -18,9 +18,14 @@ public interface EPointDAO {
 	/*
 	 * get one epoint with similar name.
 	 */
-	public EPoint getEPoint(String name) throws SQLException;
+	public EPoint getEPoint(String pointTag) throws SQLException;
 	/*
 	 * get all epoints
 	 */
-	public ArrayList<EPoint> getAllEPoints() throws SQLException;
+	public ArrayList<EPoint> getListOfEPoints() throws SQLException;
+    	/*
+	 * get all epoints in a certain experiment
+	 */
+	public ArrayList<EPoint> getListOfEPoints(String expTag) throws SQLException;
+    
 }
