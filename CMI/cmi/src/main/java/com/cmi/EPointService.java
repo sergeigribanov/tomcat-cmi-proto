@@ -13,20 +13,22 @@ import javax.ws.rs.core.Response;
 
 import java.sql.SQLException;
 
-import com.cmi.model.EPoint;
-import com.cmi.database.EPointJDBC;
+import java.io.InputStream;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import javax.ws.rs.core.StreamingOutput;
+
+
+import com.cmi.model.EPoint;
+import com.cmi.database.EPointJDBC;
+import com.cmi.filetransfering.IOFStreamer;
 
 /**
  * @author Sergei Gribanov
  *
  */
 
-@Path("/epoint")
+@Path("/points")
 public class EPointService {
     private String url;
     private String user;
@@ -45,25 +47,21 @@ public class EPointService {
 	}
     }
     @GET
-    @Path("/tr_ph_run45557.root")
-    public Response downloaFile() {
-        StreamingOutput fileStream =  new StreamingOutput() {
-		@Override
-		public void write(java.io.OutputStream output) throws IOException {
-		    try {
-			java.nio.file.Path path = Paths.get("/data/tr_ph_run45557.root");
-			byte[] data = Files.readAllBytes(path);
-			output.write(data);
-			output.flush();
-		    } catch (Exception e) {
-			// TO DO
-		    }
-		}
-	    };
+    @Path("/tr_ph_run455g57.root")
+    public Response downloadFile() {
+        StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run455g57.root");
+	// check null or throw exception
         return Response
 	    .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
 	    .header("content-disposition","attachment; filename = tr_ph_run45557.root")
 	    .build();
+    }
+    @POST
+    @Path("/upload")
+    @Consumes({MediaType.APPLICATION_OCTET_STREAM})
+    public Response uploadFile(InputStream fileInputStream) {
+	IOFStreamer.uploadFile("/data/test.root", fileInputStream);
+	return Response.ok("Data uploaded successfully !!").build();
     }
     @GET
     @Path("/{pointTag}")
