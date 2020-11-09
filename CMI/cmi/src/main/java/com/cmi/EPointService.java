@@ -16,6 +16,11 @@ import java.sql.SQLException;
 import com.cmi.model.EPoint;
 import com.cmi.database.EPointJDBC;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import javax.ws.rs.core.StreamingOutput;
+
 /**
  * @author Sergei Gribanov
  *
@@ -38,6 +43,27 @@ public class EPointService {
 	} catch (SQLException e) {
 	    // TO DO
 	}
+    }
+    @GET
+    @Path("/tr_ph_run45557.root")
+    public Response downloaFile() {
+        StreamingOutput fileStream =  new StreamingOutput() {
+		@Override
+		public void write(java.io.OutputStream output) throws IOException {
+		    try {
+			java.nio.file.Path path = Paths.get("/data/tr_ph_run45557.root");
+			byte[] data = Files.readAllBytes(path);
+			output.write(data);
+			output.flush();
+		    } catch (Exception e) {
+			// TO DO
+		    }
+		}
+	    };
+        return Response
+	    .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
+	    .header("content-disposition","attachment; filename = tr_ph_run45557.root")
+	    .build();
     }
     @GET
     @Path("/{pointTag}")
