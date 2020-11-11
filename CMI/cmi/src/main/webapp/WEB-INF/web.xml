@@ -12,9 +12,23 @@
         <servlet-name>com.cmi.RestApplication</servlet-name>
     </servlet>
 
+    <servlet>
+      <servlet-name>com.cmi.LoginApplication</servlet-name>
+      <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+      <init-param>
+        <param-name>javax.ws.rs.Application</param-name>
+        <param-value>com.cmi.LoginApplication</param-value>
+      </init-param>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>com.cmi.RestApplication</servlet-name>
         <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+
+     <servlet-mapping>
+        <servlet-name>com.cmi.LoginApplication</servlet-name>
+        <url-pattern>/login/*</url-pattern>
     </servlet-mapping>
 
     <!-- Listeners appeles dans l'ordre de declaration -->

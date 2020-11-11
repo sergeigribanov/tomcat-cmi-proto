@@ -22,7 +22,7 @@ import com.cmi.filetransfering.IOFStreamer;
 
 // import com.cmi.security.AuthentificationFilter;
 
-// import javax.annotation.security.RolesAllowed;
+import javax.annotation.security.RolesAllowed;
 
 /**
  * @author Sergei Gribanov
@@ -47,7 +47,7 @@ public class EPointService {
 	    // TO DO
 	}
     }
-    // @RolesAllowed("ADMIN")
+    @RolesAllowed("ADMIN")
     @GET
     @Path("/download")
     public Response downloadFile() {
@@ -58,7 +58,7 @@ public class EPointService {
 	    .header("content-disposition","attachment; filename = tr_ph_run45557.root")
 	    .build();
     }
-    // @RolesAllowed("ADMIN")
+    @RolesAllowed("ADMIN")
     @POST
     @Path("/upload")
     @Consumes({MediaType.APPLICATION_OCTET_STREAM})
@@ -66,7 +66,7 @@ public class EPointService {
 	IOFStreamer.uploadFile("/data/test.root", fileInputStream);
 	return Response.ok("Data uploaded successfully !!").build();
     }
-    // @RolesAllowed("ADMIN")
+    @RolesAllowed("ADMIN")
     @GET
     @Path("/{pointTag}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -79,7 +79,7 @@ public class EPointService {
 	}
 	return Response.status(200).entity(new EPoint()).build(); // TO DO : remove !!!
     }
-    // @RolesAllowed("ADMIN")
+    @RolesAllowed("ADMIN")
     @GET
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ public class EPointService {
 	}
 	return Response.status(200).entity(new ArrayList<EPoint>()).build();
     }
-    // @RolesAllowed("ADMIN")
+    @RolesAllowed("ADMIN")
     @GET
     @Path("/list/{expTag}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -105,7 +105,7 @@ public class EPointService {
 	}
 	return Response.status(200).entity(new ArrayList<EPoint>()).build();
     }
-    // @RolesAllowed("ADMIN")
+    @RolesAllowed("ADMIN")
     @POST
     @Path("/add")
     @Consumes(MediaType.APPLICATION_JSON)
