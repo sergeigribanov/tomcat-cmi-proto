@@ -2,22 +2,19 @@ package com.cmi;
 
 import java.util.ArrayList;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.sql.SQLException;
-
 import java.io.InputStream;
-
 import java.io.IOException;
 import javax.ws.rs.core.StreamingOutput;
-
 
 import com.cmi.model.EPoint;
 import com.cmi.database.EPointJDBC;
@@ -52,7 +49,7 @@ public class EPointService {
     }
     // @RolesAllowed("ADMIN")
     @GET
-    @Path("/tr_ph_run455g57.root")
+    @Path("/download")
     public Response downloadFile() {
         StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run455g57.root");
 	// check null or throw exception

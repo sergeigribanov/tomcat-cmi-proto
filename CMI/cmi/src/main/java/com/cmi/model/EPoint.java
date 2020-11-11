@@ -1,18 +1,18 @@
 package com.cmi.model;
 
-import java.io.Serializable;
-
 /**
  * @author Sergei Gribanov
  *
  */
 
-public class EPoint implements Serializable {
+public class EPoint {
     private String pointTag;
     private String expTag;
     private double beamEnergy;
     private double beamEnergyError;
     private double magneticField;
+    public EPoint() {
+    }
     public String getPointTag() {
 	return pointTag;
     }
