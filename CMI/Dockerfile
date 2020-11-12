@@ -4,6 +4,7 @@ MAINTAINER ssgribanov@gmail.com
 
 RUN yum install -y java-11-openjdk-devel
 RUN yum install -y which
+RUN yum install -y sqlite
 
 # Install Maven
 ENV MAVEN_MAJOR 3

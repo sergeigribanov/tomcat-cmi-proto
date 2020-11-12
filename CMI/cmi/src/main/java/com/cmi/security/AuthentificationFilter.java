@@ -18,6 +18,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
  
 import java.util.Base64;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
+
+// import java.security.NoSuchAlgorithmException;
+import org.mindrot.jbcrypt.BCrypt;
  
 /**
  * This filter verify the access permissions for a user
@@ -87,21 +97,47 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
         }
     }
     private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet) {
-        boolean isAllowed = false;
-          
+	boolean isAllowed = false;
         //Step 1. Fetch password from database and match with password in argument
         //If both match then get the defined role for user from database and continue; else return isAllowed [false]
         //Access the database and do this part yourself
         //String userRole = userMgr.getUserRole(username);
-         
-        if(username.equals("sergei") && password.equals("password")) {
-            String userRole = "ADMIN";
-	    isAllowed = true; // !!!
-            //Step 2. Verify user role
-            // if(rolesSet.contains(userRole)) {
-            //     isAllowed = true;
-            // }
+	String dbUserRole = null;
+	String dbHash = null;
+	String sql = "SELECT userrole, hash FROM users WHERE username = ?";
+	Connection conn = null;
+	try {
+	    conn = DriverManager.getConnection("jdbc:postgresql://172.16.238.11/cmi", "postgres", "1234");
+	    PreparedStatement pstmt  = conn.prepareStatement(sql);
+	    pstmt.setString(1, username);
+	    ResultSet rs  = pstmt.executeQuery();
+            while (rs.next()) {
+		dbUserRole = rs.getString("userrole");
+		dbHash = rs.getString("hash");
+            }
+	    isAllowed = BCrypt.checkpw(password, dbHash);
+	} catch (SQLException e) {
+	    // TO DO ... Make same error codes in cases if username does not exist or password does not exist
+	} finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+		// TO DO ...
+            }
         }
-        return isAllowed;
+	return isAllowed;
+	// // return true; // !!!
+	// // // try {
+	// if(rightPassword) {
+	//     // String userRole = "ADMIN";
+	//     // TO DO : !!! test user roles
+	//     isAllowed = true;
+	// }
+	// // // } catch (NoSuchAlgorithmException e) {
+	// // //     // TO DO ...
+	// // // }
+	// return isAllowed;
     }
 }
