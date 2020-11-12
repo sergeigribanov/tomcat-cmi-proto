@@ -98,10 +98,6 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
     }
     private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet) {
 	boolean isAllowed = false;
-        //Step 1. Fetch password from database and match with password in argument
-        //If both match then get the defined role for user from database and continue; else return isAllowed [false]
-        //Access the database and do this part yourself
-        //String userRole = userMgr.getUserRole(username);
 	String dbUserRole = null;
 	String dbHash = null;
 	String sql = "SELECT userrole, hash FROM users WHERE username = ?";
@@ -115,7 +111,7 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
 		dbUserRole = rs.getString("userrole");
 		dbHash = rs.getString("hash");
             }
-	    isAllowed = BCrypt.checkpw(password, dbHash);
+	    isAllowed = BCrypt.checkpw(password, dbHash) && rolesSet.contains(dbUserRole);
 	} catch (SQLException e) {
 	    // TO DO ... Make same error codes in cases if username does not exist or password does not exist
 	} finally {

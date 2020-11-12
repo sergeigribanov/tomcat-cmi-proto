@@ -50,8 +50,9 @@ public class EPointService {
     @RolesAllowed("ADMIN")
     @GET
     @Path("/download")
+    @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response downloadFile() {
-        StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run455g57.root");
+        StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run45557.root");
 	// check null or throw exception
         return Response
 	    .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
