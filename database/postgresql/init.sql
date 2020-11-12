@@ -1,6 +1,7 @@
 CREATE TABLE experiments (
        id SERIAL,
-       etag TEXT UNIQUE NOT NULL
+       etag TEXT UNIQUE NOT NULL,
+       CONSTRAINT etag_ct CHECK (etag ~ '^[A-Za-z0-9]+$')
 );
 
 CREATE TABLE users (
@@ -16,7 +17,8 @@ CREATE TABLE epoints (
        ptag TEXT UNIQUE NOT NULL,
        ebeam REAL,
        ebeam_err REAL,
-       mfield REAL
+       mfield REAL,
+       CONSTRAINT ptag_ct CHECK (ptag ~ '^[0-9\.]+_\d+$')
 );
 
 INSERT INTO experiments (etag) VALUES
