@@ -26,10 +26,11 @@ CREATE TABLE users (
        hash TEXT NOT NULL
 );
 
-INSERT INTO userroles (userrole) VALUES ('ADMIN');
+INSERT INTO userroles (userrole) VALUES ('ADMIN'), ('READONLY');
 
 INSERT INTO users (username, userrole, hash) VALUES
-('sergei', 'ADMIN', '$2a$12$/aw2PFksCDGbT6kiSQiLbu3RQgn2MoDoB6e5xDnx5dcstKfDo57iy');
+('admin', 'ADMIN', '$2a$12$/aw2PFksCDGbT6kiSQiLbu3RQgn2MoDoB6e5xDnx5dcstKfDo57iy'),
+('sergei', 'READONLY', '$2a$12$VhKTfJSDHVWiwf.9hH8SzeoPAk3fyt9iAovenwCeixFvew1uZVQNe');
 
 INSERT INTO experiments (etag) VALUES
 ('HIGH2011'),
