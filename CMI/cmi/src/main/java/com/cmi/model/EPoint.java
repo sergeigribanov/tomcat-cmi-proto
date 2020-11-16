@@ -9,7 +9,6 @@ public class EPoint {
     private String pointTag;
     private String expTag;
     private double beamEnergy;
-    private double beamEnergyError;
     private double magneticField;
     public EPoint() {
     }
@@ -30,12 +29,6 @@ public class EPoint {
     }
     public void setBeamEnergy(double beamEnergy) {
 	this.beamEnergy = beamEnergy;
-    }
-    public double getBeamEnergyError() {
-	return beamEnergyError;
-    }
-    public void setBeamEnergyError(double beamEnergyError) {
-	this.beamEnergyError = beamEnergyError;
     }
     public double getMagneticField() {
 	return magneticField;

@@ -25,7 +25,7 @@ public class EPointJDBC implements EPointDAO{
     
     public void addEPoint(EPoint epoint) throws SQLException {
 	//query of postgresql
-	String sql = "insert into epoints(ptag, etag, ebeam, ebeam_err, mfield)"
+	String sql = "insert into epoints(ptag, etag, ebeam, mfield)"
 	    + "values (?,?,?,?,?)";
 	
 	PreparedStatement ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -37,8 +37,7 @@ public class EPointJDBC implements EPointDAO{
 	ps.setString(2, epoint.getExpTag());
 	// 3 = third '?'
 	ps.setDouble(3, epoint.getBeamEnergy());
-	ps.setDouble(4, epoint.getBeamEnergyError());
-	ps.setDouble(5, epoint.getMagneticField());
+	ps.setDouble(4, epoint.getMagneticField());
 	
 	//use execute update when the database return nothing
 	ps.executeUpdate();
@@ -69,7 +68,6 @@ public class EPointJDBC implements EPointDAO{
 	    epoint.setPointTag(result.getString("ptag"));
 	    epoint.setExpTag(result.getString("etag"));
 	    epoint.setBeamEnergy(result.getDouble("ebeam"));
-	    epoint.setBeamEnergyError(result.getDouble("ebeam_err"));
 	    epoint.setMagneticField(result.getDouble("mfield"));
 	    result.close();
 	    return epoint;
@@ -90,7 +88,6 @@ public class EPointJDBC implements EPointDAO{
 	    epoint.setPointTag(result.getString("ptag"));
 	    epoint.setExpTag(result.getString("etag"));
 	    epoint.setBeamEnergy(result.getDouble("ebeam"));
-	    epoint.setBeamEnergyError(result.getDouble("ebeam_err"));
 	    epoint.setMagneticField(result.getDouble("mfield"));
 	    array.add(epoint);
 	}
@@ -112,7 +109,6 @@ public class EPointJDBC implements EPointDAO{
 	    epoint.setPointTag(result.getString("ptag"));
 	    epoint.setExpTag(result.getString("etag"));
 	    epoint.setBeamEnergy(result.getDouble("ebeam"));
-	    epoint.setBeamEnergyError(result.getDouble("ebeam_err"));
 	    epoint.setMagneticField(result.getDouble("mfield"));
 	    array.add(epoint);
 	}
