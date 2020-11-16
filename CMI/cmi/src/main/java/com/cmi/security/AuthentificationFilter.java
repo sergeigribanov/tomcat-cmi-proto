@@ -124,16 +124,5 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
             }
         }
 	return isAllowed;
-	// // return true; // !!!
-	// // // try {
-	// if(rightPassword) {
-	//     // String userRole = "ADMIN";
-	//     // TO DO : !!! test user roles
-	//     isAllowed = true;
-	// }
-	// // // } catch (NoSuchAlgorithmException e) {
-	// // //     // TO DO ...
-	// // // }
-	// return isAllowed;
     }
 }

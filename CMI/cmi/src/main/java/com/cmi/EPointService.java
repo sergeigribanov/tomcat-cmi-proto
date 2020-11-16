@@ -47,7 +47,7 @@ public class EPointService {
 	    // TO DO
 	}
     }
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", "READONLY"})
     @GET
     @Path("/download")
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
@@ -67,7 +67,7 @@ public class EPointService {
 	IOFStreamer.uploadFile("/data/test.root", fileInputStream);
 	return Response.ok("Data uploaded successfully !!").build();
     }
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", "READONLY"})
     @GET
     @Path("/{pointTag}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -80,7 +80,7 @@ public class EPointService {
 	}
 	return Response.status(200).entity(new EPoint()).build(); // TO DO : remove !!!
     }
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", "READONLY"})
     @GET
     @Path("/list")
     @Produces(MediaType.APPLICATION_JSON)
@@ -93,7 +93,7 @@ public class EPointService {
 	}
 	return Response.status(200).entity(new ArrayList<EPoint>()).build();
     }
-    @RolesAllowed("ADMIN")
+    @RolesAllowed({"ADMIN", "READONLY"})
     @GET
     @Path("/list/{expTag}")
     @Produces(MediaType.APPLICATION_JSON)
