@@ -18,6 +18,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import com.cmi.model.EPoint;
 import com.cmi.database.EPointJDBC;
+import com.cmi.database.DataBaseException;
 import com.cmi.filetransfering.IOFStreamer;
 
 // import com.cmi.security.AuthentificationFilter;
@@ -74,11 +75,16 @@ public class EPointService {
     public Response getEPointJSONHandler(@PathParam("pointTag") String pointTag) {
 	try {
 	    EPoint pt = pjdbc.getEPoint(pointTag);
-	    return Response.status(200).entity(pt).build();
+	    if (pt == null) { // TO DO : probably better to throw exception from getEPoint
+		return Response.status(204).build();
+	    } else {
+		return Response.status(200).entity(pt).build();
+	    }
 	} catch (SQLException e) {
-	    // TO DO
+	    return Response.status(500).build();
+	} catch (DataBaseException e) {
+	    return Response.status(204).build();
 	}
-	return Response.status(200).entity(new EPoint()).build(); // TO DO : remove !!!
     }
     @RolesAllowed({"ADMIN", "READONLY"})
     @GET
@@ -89,9 +95,8 @@ public class EPointService {
 	    ArrayList<EPoint> array = pjdbc.getListOfEPoints();
 	    return Response.status(200).entity(array).build();
 	} catch (SQLException e) {
-	    // TO DO
+	    return Response.status(500).build();
 	}
-	return Response.status(200).entity(new ArrayList<EPoint>()).build();
     }
     @RolesAllowed({"ADMIN", "READONLY"})
     @GET
@@ -101,10 +106,11 @@ public class EPointService {
 	try {
 	    ArrayList<EPoint> array = pjdbc.getListOfEPoints(expTag);
 	    return Response.status(200).entity(array).build();
+	} catch (DataBaseException e) {
+	    return Response.status(204).build();
 	} catch (SQLException e) {
-	    // TO DO
+	    return Response.status(500).build();
 	}
-	return Response.status(200).entity(new ArrayList<EPoint>()).build();
     }
     @RolesAllowed("ADMIN")
     @POST

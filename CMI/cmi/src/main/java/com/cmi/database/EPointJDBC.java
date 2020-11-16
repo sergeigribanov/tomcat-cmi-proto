@@ -45,26 +45,23 @@ public class EPointJDBC implements EPointDAO{
 	ResultSet generatedKeys =  ps.getGeneratedKeys();
 	if(generatedKeys.next()) {
 	    epoint.setPointTag(generatedKeys.getString(1));
-	}
-	
+	}	
     }
 
-    public void removeEPoint(EPoint epoint) throws SQLException {
+    public void removeEPoint(EPoint epoint) throws SQLException  {
 	String sql = "delete from epoints where ptag = ?";
 	PreparedStatement ps = this.connection.prepareStatement(sql);
 	ps.setString(1, epoint.getPointTag());
 	ps.executeUpdate();
     }
 
-    public EPoint getEPoint(String pointTag) throws SQLException {
+    public EPoint getEPoint(String pointTag) throws SQLException, DataBaseException {
 	String sql = "select * from epoints where ptag = ?";
 	PreparedStatement ps = this.connection.prepareStatement(sql);
 	ps.setString(1, pointTag);
 	ResultSet result = ps.executeQuery();
 	while(result.next()) {
-	    //new EPoint
 	    EPoint epoint = new EPoint();
-	    //get column of name
 	    epoint.setPointTag(result.getString("ptag"));
 	    epoint.setExpTag(result.getString("etag"));
 	    epoint.setBeamEnergy(result.getDouble("ebeam"));
@@ -72,19 +69,14 @@ public class EPointJDBC implements EPointDAO{
 	    result.close();
 	    return epoint;
 	}
-	
-	return null;
+	throw new DataBaseException("Energy point tag \"" + pointTag + "\" not found!");
     }
 
     public ArrayList<EPoint> getListOfEPoints() throws SQLException {
 	ArrayList<EPoint> array = new ArrayList<EPoint>();
-	//get all epoints
-	//query of postgresql
 	ResultSet result = this.connection.prepareStatement("select * from epoints").executeQuery();
 	while(result.next()) {
-	    //new EPoint
 	    EPoint epoint = new EPoint();
-	    //get column of name
 	    epoint.setPointTag(result.getString("ptag"));
 	    epoint.setExpTag(result.getString("etag"));
 	    epoint.setBeamEnergy(result.getDouble("ebeam"));
@@ -94,18 +86,14 @@ public class EPointJDBC implements EPointDAO{
 	result.close();
 	return array;
     }
-    public ArrayList<EPoint> getListOfEPoints(String expTag) throws SQLException {
+    public ArrayList<EPoint> getListOfEPoints(String expTag) throws SQLException, DataBaseException {
 	ArrayList<EPoint> array = new ArrayList<EPoint>();
-	//get all epoints
-	//query of postgresql
 	String sql = "select * from epoints where etag = ?";
 	PreparedStatement ps = this.connection.prepareStatement(sql);
 	ps.setString(1, expTag);
 	ResultSet result = ps.executeQuery();
 	while(result.next()) {
-	    //new EPoint
 	    EPoint epoint = new EPoint();
-	    //get column of name
 	    epoint.setPointTag(result.getString("ptag"));
 	    epoint.setExpTag(result.getString("etag"));
 	    epoint.setBeamEnergy(result.getDouble("ebeam"));
@@ -113,6 +101,18 @@ public class EPointJDBC implements EPointDAO{
 	    array.add(epoint);
 	}
 	result.close();
+	if (array.size() == 0 && !this.getListOfExpTags().contains(expTag)) {
+	    throw new DataBaseException("Experiment tag \"" + expTag + "\" not found!");
+	}
+	return array;
+    }
+    public ArrayList<String> getListOfExpTags() throws SQLException {
+	ArrayList<String> array = new ArrayList<String>();
+	String sql = "select etag from experiments";
+	ResultSet result = this.connection.createStatement().executeQuery(sql);
+	while (result.next()) {
+	    array.add(result.getString("etag"));
+	}
 	return array;
     }
 }
