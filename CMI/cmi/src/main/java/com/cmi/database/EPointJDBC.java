@@ -1,5 +1,6 @@
 package com.cmi.database;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import com.cmi.model.EPoint;
 import com.cmi.database.EPointDAO;
 
-public class EPointJDBC implements EPointDAO{
+public class EPointJDBC implements EPointDAO {
     
     private Connection connection;
     
@@ -21,6 +22,13 @@ public class EPointJDBC implements EPointDAO{
 	Class.forName("org.postgresql.Driver");
 	//open the connection
 	this.connection = DriverManager.getConnection(url, user, password);
+    }
+
+    public EPointJDBC(String dbTag, String path) throws ClassNotFoundException, IOException, SQLException {
+	//load driver communication of postgresql.
+	Class.forName("org.postgresql.Driver");
+	//open the connection
+	this.connection = JDBCConnectWithJSONFile.getConnection(dbTag, path);
     }
     
     public void addEPoint(EPoint epoint) throws SQLException {

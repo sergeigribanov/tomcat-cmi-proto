@@ -38,18 +38,7 @@ public class EPointService {
     private EPointJDBC pjdbc;
     public EPointService() {
 	try {
-	    ObjectMapper mapper = new ObjectMapper();
-	    JsonNode node = mapper.readTree(new File("/etc/conf.d/dbconfig_CMI.json"))
-		.path("db_epoints");
-	    final String dataBaseType = node.path("type").asText();
-	    final String ipAddress = node.path("ip").asText();
-	    final String dataBaseName = node.path("name").asText();
-	    final String url = String.format("jdbc:%s://%s/%s", dataBaseType,
-					     ipAddress, dataBaseName);
-	    final String user = node.path("user").asText();
-	    final String password = node.path("password").asText();
-	    
-	    pjdbc = new EPointJDBC(url, user, password);
+	    pjdbc = new EPointJDBC("db_epoints", "/etc/conf.d/dbconfig_CMI.json");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}

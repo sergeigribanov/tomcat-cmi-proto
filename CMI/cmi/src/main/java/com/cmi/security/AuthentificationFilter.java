@@ -1,5 +1,6 @@
 package com.cmi.security;
- 
+
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.cmi.database.DataBaseException;
+import com.cmi.database.JDBCConnectWithJSONFile;
 
 /**
  * This filter verify the access permissions for a user
@@ -107,26 +109,21 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
 					 .entity(node).build());
 		return;
 	    }
-	} catch (DataBaseException e) {
-	    ObjectMapper mapper = new ObjectMapper();
-	    ObjectNode node = mapper.createObjectNode();
-	    node.put("error", "You cannot access this resource!");
-	    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-				     .entity(node).build());
-	} catch (SQLException e) {
+	} catch (Exception e) {
 	    ObjectMapper mapper = new ObjectMapper();
 	    ObjectNode node = mapper.createObjectNode();
 	    node.put("error", "You cannot access this resource!");
 	    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
 				     .entity(node).build());
 	    return;
-	}
+	};
     }
-    private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet) throws SQLException, DataBaseException {
+    private boolean isUserAllowed(final String username, final String password, final Set<String> rolesSet) throws ClassNotFoundException, IOException, SQLException, DataBaseException {
+	Class.forName("org.postgresql.Driver");
 	String dbUserRole = null;
 	String dbHash = null;
 	String sql = "SELECT userrole, hash FROM users WHERE username = ?";
-	Connection conn = DriverManager.getConnection("jdbc:postgresql://172.16.238.11/cmi", "postgres", "1234");
+	Connection conn = JDBCConnectWithJSONFile.getConnection("db_auth", "/etc/conf.d/dbconfig_CMI.json");
 	PreparedStatement pstmt  = conn.prepareStatement(sql);
 	pstmt.setString(1, username);
 	ResultSet rs  = pstmt.executeQuery();
