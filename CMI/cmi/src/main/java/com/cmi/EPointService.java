@@ -74,11 +74,19 @@ public class EPointService {
     }
     @RolesAllowed("ADMIN")
     @POST
-    @Path("/upload")
+    @Path("/{pointTag}/sim/{simTag}/tr_ph")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
-    public Response uploadFile(InputStream fileInputStream) {
-	IOFStreamer.uploadFile("share/test_upload.root", fileInputStream);
+    public Response uploadSimTrPhFile(@PathParam("pointTag") String pointTag,
+				      @PathParam("simTag") String simTag,
+				      InputStream fileInputStream) {
+	try {
+	    final String path = pathJDBC.getSimFlatTreePath(pointTag, simTag)
+		.getPath();
+	    IOFStreamer.uploadFile(path, fileInputStream);
+	} catch (Exception e) {
+	    // !!! TO DO
+	}
 	ObjectMapper mapper = new ObjectMapper();
 	ObjectNode node = mapper.createObjectNode();
 	node.put("status", "Data uploaded successfully!");
