@@ -11,6 +11,7 @@ services:
         ipv4_address: 172.16.238.10
     depends_on:
       - postgresqldb
+      - sftpsrv
 
   postgresqldb:
     build: database/postgresql
