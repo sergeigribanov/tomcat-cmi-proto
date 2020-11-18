@@ -24,7 +24,7 @@ RUN mkdir -p "$CATALINA_HOME"
 WORKDIR ${CATALINA_HOME}
 
 ENV TOMCAT_MAJOR 9
-ENV TOMCAT_VERSION 9.0.39
+ENV TOMCAT_VERSION 9.0.40
 ENV TOMCAT_TGZ_URL https://www.apache.org/dist/tomcat/tomcat-${TOMCAT_MAJOR}/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
 RUN set -x \

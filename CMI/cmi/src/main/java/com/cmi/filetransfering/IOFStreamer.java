@@ -9,22 +9,56 @@ import java.io.FileOutputStream;
 import java.io.File;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
+
 public class IOFStreamer {
     public static StreamingOutput outputStream(final String hostFilePath) {
 	StreamingOutput fileStream = new StreamingOutput() {
 		@Override
-		public void write(java.io.OutputStream output) throws IOException {
+		public void write(java.io.OutputStream output) throws IOException  {
+		    // java.nio.file.Path path = Paths.get(hostFilePath);
+		    // byte[] data = Files.readAllBytes(path);
+		    // output.write(data);
+		    String user = "foo";
+		    String password = "123";
+		    String host = "172.16.238.12";
+		    int port = 22;
+		    String remoteFile = "share/test.root";
 		    try {
-			java.nio.file.Path path = Paths.get(hostFilePath);
-			byte[] data = Files.readAllBytes(path);
-			output.write(data);
+			JSch jsch = new JSch();
+			Session session = jsch.getSession(user, host, port);
+			session.setPassword(password);
+			session.setConfig("StrictHostKeyChecking", "no");
+			session.connect();
+			ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
+			sftpChannel.connect();
+			InputStream input = sftpChannel.get(remoteFile);
+			input.transferTo(output);
 			output.flush();
-		    } catch (Exception e) {
-			// TO DO // return null or throw execption
+		    } catch (JSchException e) {
+		    } catch (SftpException e) {
 		    }
 		}
 	    };
 	return fileStream;
+	// StreamingOutput fileStream = new StreamingOutput() {
+	// 	@Override
+	// 	public void write(java.io.OutputStream output) throws IOException {
+	// 	    try {
+	// 		java.nio.file.Path path = Paths.get(hostFilePath);
+	// 		byte[] data = Files.readAllBytes(path);
+	// 		output.write(data);
+	// 		output.flush();
+	// 	    } catch (Exception e) {
+	// 		// TO DO // return null or throw execption
+	// 	    }
+	// 	}
+	//     };
+	// return fileStream;
     }
     public static void uploadFile(final String hostFilePath,
 				  InputStream fileInputStream) {

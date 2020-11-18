@@ -48,12 +48,20 @@ public class EPointService {
     @Path("/download")
     @Produces({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
     public Response downloadFile() {
+	try {
         StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run45557.root");
-	// check null or throw exception
         return Response
 	    .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
 	    .header("content-disposition","attachment; filename = tr_ph_run45557.root")
 	    .build();
+	} catch (Exception e) {
+	    // !!! TO DO : catch exception carefully, set right response statuses
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		.entity(node).build();
+	}
     }
     @RolesAllowed("ADMIN")
     @POST
