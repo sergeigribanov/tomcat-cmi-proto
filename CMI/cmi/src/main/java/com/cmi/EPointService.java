@@ -49,10 +49,10 @@ public class EPointService {
     @Produces({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
     public Response downloadFile() {
 	try {
-        StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run45557.root");
+        StreamingOutput fileStream = IOFStreamer.download("share/test.root");
         return Response
 	    .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
-	    .header("content-disposition","attachment; filename = tr_ph_run45557.root")
+	    .header("content-disposition","attachment; filename = test.root")
 	    .build();
 	} catch (Exception e) {
 	    // !!! TO DO : catch exception carefully, set right response statuses
@@ -69,7 +69,7 @@ public class EPointService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response uploadFile(InputStream fileInputStream) {
-	IOFStreamer.uploadFile("/data/test.root", fileInputStream);
+	IOFStreamer.uploadFile("share/test_upload.root", fileInputStream);
 	ObjectMapper mapper = new ObjectMapper();
 	ObjectNode node = mapper.createObjectNode();
 	node.put("status", "Data uploaded successfully!");
