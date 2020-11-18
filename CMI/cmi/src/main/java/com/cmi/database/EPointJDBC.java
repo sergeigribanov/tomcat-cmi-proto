@@ -69,7 +69,7 @@ public class EPointJDBC implements EPointDAO{
 	    result.close();
 	    return epoint;
 	}
-	throw new DataBaseException("Energy point tag \"" + pointTag + "\" not found!");
+	throw new DataBaseException(String.format("Energy point tag (%s) not found!", pointTag));
     }
 
     public ArrayList<EPoint> getListOfEPoints() throws SQLException {
@@ -102,8 +102,9 @@ public class EPointJDBC implements EPointDAO{
 	}
 	result.close();
 	if (array.size() == 0 && !this.getListOfExpTags().contains(expTag)) {
-	    throw new DataBaseException("Experiment tag \"" + expTag + "\" not found!");
+	    throw new DataBaseException(String.format("Experiment tag (%s) not found!", expTag));
 	}
+	
 	return array;
     }
     public ArrayList<String> getListOfExpTags() throws SQLException {

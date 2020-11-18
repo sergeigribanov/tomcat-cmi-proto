@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 
 import java.sql.SQLException;
 import java.io.InputStream;
+import java.io.File;
 import java.io.IOException;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -21,9 +22,11 @@ import com.cmi.database.EPointJDBC;
 import com.cmi.database.DataBaseException;
 import com.cmi.filetransfering.IOFStreamer;
 
-// import com.cmi.security.AuthentificationFilter;
-
 import javax.annotation.security.RolesAllowed;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Sergei Gribanov
@@ -32,26 +35,29 @@ import javax.annotation.security.RolesAllowed;
 
 @Path("/points")
 public class EPointService {
-    private String url;
-    private String user;
-    private String password;
     private EPointJDBC pjdbc;
     public EPointService() {
-	url = "jdbc:postgresql://172.16.238.11/cmi";
-	user = "postgres";
-	password = "1234";
 	try {
+	    ObjectMapper mapper = new ObjectMapper();
+	    JsonNode node = mapper.readTree(new File("/etc/conf.d/dbconfig_CMI.json"))
+		.path("db_epoints");
+	    final String dataBaseType = node.path("type").asText();
+	    final String ipAddress = node.path("ip").asText();
+	    final String dataBaseName = node.path("name").asText();
+	    final String url = String.format("jdbc:%s://%s/%s", dataBaseType,
+					     ipAddress, dataBaseName);
+	    final String user = node.path("user").asText();
+	    final String password = node.path("password").asText();
+	    
 	    pjdbc = new EPointJDBC(url, user, password);
-	} catch (ClassNotFoundException e) {
-	    // TO DO
-	} catch (SQLException e) {
-	    // TO DO
+	} catch (Exception e) {
+	    e.printStackTrace();
 	}
     }
     @RolesAllowed({"ADMIN", "READONLY"})
     @GET
     @Path("/download")
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
     public Response downloadFile() {
         StreamingOutput fileStream = IOFStreamer.outputStream("/data/tr_ph_run45557.root");
 	// check null or throw exception
@@ -63,10 +69,14 @@ public class EPointService {
     @RolesAllowed("ADMIN")
     @POST
     @Path("/upload")
-    @Consumes({MediaType.APPLICATION_OCTET_STREAM})
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response uploadFile(InputStream fileInputStream) {
 	IOFStreamer.uploadFile("/data/test.root", fileInputStream);
-	return Response.ok("Data uploaded successfully !!").build();
+	ObjectMapper mapper = new ObjectMapper();
+	ObjectNode node = mapper.createObjectNode();
+	node.put("status", "Data uploaded successfully!");
+	return Response.ok(node).build();
     }
     @RolesAllowed({"ADMIN", "READONLY"})
     @GET
@@ -75,15 +85,18 @@ public class EPointService {
     public Response getEPointJSONHandler(@PathParam("pointTag") String pointTag) {
 	try {
 	    EPoint pt = pjdbc.getEPoint(pointTag);
-	    if (pt == null) { // TO DO : probably better to throw exception from getEPoint
-		return Response.status(204).build();
-	    } else {
-		return Response.status(200).entity(pt).build();
-	    }
+	    return Response.status(200).entity(pt).build();
 	} catch (SQLException e) {
-	    return Response.status(500).build();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		.entity(node).build();
 	} catch (DataBaseException e) {
-	    return Response.status(204).build();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.NOT_FOUND).entity(node).build();
 	}
     }
     @RolesAllowed({"ADMIN", "READONLY"})
@@ -95,7 +108,11 @@ public class EPointService {
 	    ArrayList<EPoint> array = pjdbc.getListOfEPoints();
 	    return Response.status(200).entity(array).build();
 	} catch (SQLException e) {
-	    return Response.status(500).build();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		.entity(node).build();
 	}
     }
     @RolesAllowed({"ADMIN", "READONLY"})
@@ -107,23 +124,38 @@ public class EPointService {
 	    ArrayList<EPoint> array = pjdbc.getListOfEPoints(expTag);
 	    return Response.status(200).entity(array).build();
 	} catch (DataBaseException e) {
-	    return Response.status(204).build();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.NOT_FOUND).entity(node).build();
 	} catch (SQLException e) {
-	    return Response.status(500).build();
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		.entity(node).build();
 	}
     }
     @RolesAllowed("ADMIN")
     @POST
     @Path("/add")
+    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addEPointHandler(EPoint point) {
-	String result = "energy point added successfully : " + point.getPointTag();
 	// write code to add energy point into db or in-memory.
 	try {
 	    pjdbc.addEPoint(point);
 	} catch (SQLException e) {
-	    // TO DO
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", e.toString());
+	    return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+		.entity(node).build();
 	}
-	return Response.status(201).entity(result).build();
+	ObjectMapper mapper = new ObjectMapper();
+	ObjectNode node = mapper.createObjectNode();
+	node.put("status", String.format("Energy point with tag (%s) was added successfully!",
+					 point.getPointTag()));
+	return Response.status(Response.Status.CREATED).entity(node).build();
     }
 }

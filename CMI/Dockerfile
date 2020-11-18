@@ -6,6 +6,9 @@ RUN yum install -y java-11-openjdk-devel
 RUN yum install -y which
 RUN yum install -y sqlite
 
+WORKDIR /etc/conf.d
+COPY db_config.json dbconfig_CMI.json
+
 # Install Maven
 ENV MAVEN_MAJOR 3
 ENV MAVEN_VERSION 3.3.1

@@ -28,8 +28,11 @@ import java.sql.PreparedStatement;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.cmi.database.DataBaseException;
- 
+
 /**
  * This filter verify the access permissions for a user
  * based on username and passowrd provided in request
@@ -52,8 +55,11 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
 	}
 	//Access denied for all
 	if(method.isAnnotationPresent(DenyAll.class)) {
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", "Access blocked for all users!");
 	    requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-				     .entity("Access blocked for all users !!").build());
+				     .entity(node).build());
 	    return;
 	}
               
@@ -65,8 +71,11 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
               
 	//If no authorization information present; block access
 	if(authorization == null || authorization.isEmpty()) {
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", "You cannot access this resource!");
 	    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-				     .entity("You cannot access this resource").build());
+				     .entity(node).build());
 	    return;
 	}
               
@@ -91,16 +100,25 @@ public class AuthentificationFilter implements javax.ws.rs.container.ContainerRe
 	//Is user valid?
 	try {
 	    if( ! isUserAllowed(username, password, rolesSet)) {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode node = mapper.createObjectNode();
+		node.put("error", "You cannot access this resource!");
 		requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-					 .entity("You cannot access this resource").build());
+					 .entity(node).build());
 		return;
 	    }
 	} catch (DataBaseException e) {
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", "You cannot access this resource!");
 	    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-				     .entity("You cannot access this resource").build());
+				     .entity(node).build());
 	} catch (SQLException e) {
+	    ObjectMapper mapper = new ObjectMapper();
+	    ObjectNode node = mapper.createObjectNode();
+	    node.put("error", "You cannot access this resource!");
 	    requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-				     .entity("You cannot access this resource").build());
+				     .entity(node).build());
 	    return;
 	}
     }

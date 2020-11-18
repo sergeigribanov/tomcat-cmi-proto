@@ -1,0 +1,16 @@
+{
+    "db_epoints" : {
+	"type" : "postgresql",
+	"ip" : "172.16.238.11",
+	"name" : "cmi",
+	"user" : "postgres",
+	"password" : "1234"
+    },
+    "db_auth" : {
+	"type" : "postgresql",
+	"ip" : "172.16.238.11",
+	"name" : "cmi",
+	"user" : "postgres",
+	"password" : "1234"
+    }
+}

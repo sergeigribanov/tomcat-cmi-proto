@@ -19,8 +19,15 @@ services:
     networks:
       cmi_net:
         ipv4_address: 172.16.238.11
-    
-  
+
+  sftpsrv:
+    build: sftp
+    ports:
+      - "22:22"
+    networks:
+      cmi_net:
+        ipv4_address: 172.16.238.12
+      
 networks:
   cmi_net:
     ipam:
