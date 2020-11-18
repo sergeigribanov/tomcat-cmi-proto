@@ -19,6 +19,9 @@ import javax.ws.rs.core.StreamingOutput;
 
 import com.cmi.model.EPoint;
 import com.cmi.database.EPointJDBC;
+import com.cmi.model.SimFlatTreePath;
+import com.cmi.database.SimFlatTreePathJDBC;
+
 import com.cmi.database.DataBaseException;
 import com.cmi.filetransfering.IOFStreamer;
 
@@ -28,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.JsonNode;
 
+
 /**
  * @author Sergei Gribanov
  *
@@ -35,21 +39,26 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @Path("/points")
 public class EPointService {
-    private EPointJDBC pjdbc;
+    private EPointJDBC epointJDBC;
+    private SimFlatTreePathJDBC pathJDBC;
     public EPointService() {
 	try {
-	    pjdbc = new EPointJDBC("db_epoints", "/etc/conf.d/dbconfig_CMI.json");
+	    epointJDBC = new EPointJDBC("db_epoints", "/etc/conf.d/dbconfig_CMI.json");
+	    pathJDBC = new SimFlatTreePathJDBC("db_epoints", "/etc/conf.d/dbconfig_CMI.json");
 	} catch (Exception e) {
 	    e.printStackTrace();
 	}
     }
     @RolesAllowed({"ADMIN", "READONLY"})
     @GET
-    @Path("/download")
+    @Path("/{pointTag}/sim/{simTag}/tr_ph")
     @Produces({MediaType.APPLICATION_OCTET_STREAM, MediaType.APPLICATION_JSON})
-    public Response downloadFile() {
+    public Response downloadSimTrPhFile(@PathParam("pointTag") String pointTag,
+					@PathParam("simTag") String simTag) {
 	try {
-        StreamingOutput fileStream = IOFStreamer.download("share/test.root");
+	    final String path = pathJDBC.getSimFlatTreePath(pointTag, simTag)
+		.getPath();
+	    StreamingOutput fileStream = IOFStreamer.download(path);
         return Response
 	    .ok(fileStream, MediaType.APPLICATION_OCTET_STREAM)
 	    .header("content-disposition","attachment; filename = test.root")
@@ -81,7 +90,7 @@ public class EPointService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEPointJSONHandler(@PathParam("pointTag") String pointTag) {
 	try {
-	    EPoint pt = pjdbc.getEPoint(pointTag);
+	    EPoint pt = epointJDBC.getEPoint(pointTag);
 	    return Response.status(200).entity(pt).build();
 	} catch (SQLException e) {
 	    ObjectMapper mapper = new ObjectMapper();
@@ -102,7 +111,7 @@ public class EPointService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEPointList() {
 	try {
-	    ArrayList<EPoint> array = pjdbc.getListOfEPoints();
+	    ArrayList<EPoint> array = epointJDBC.getListOfEPoints();
 	    return Response.status(200).entity(array).build();
 	} catch (SQLException e) {
 	    ObjectMapper mapper = new ObjectMapper();
@@ -118,7 +127,7 @@ public class EPointService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getEPointList(@PathParam("expTag") String expTag) {
 	try {
-	    ArrayList<EPoint> array = pjdbc.getListOfEPoints(expTag);
+	    ArrayList<EPoint> array = epointJDBC.getListOfEPoints(expTag);
 	    return Response.status(200).entity(array).build();
 	} catch (DataBaseException e) {
 	    ObjectMapper mapper = new ObjectMapper();
@@ -141,7 +150,7 @@ public class EPointService {
     public Response addEPointHandler(EPoint point) {
 	// write code to add energy point into db or in-memory.
 	try {
-	    pjdbc.addEPoint(point);
+	    epointJDBC.addEPoint(point);
 	} catch (SQLException e) {
 	    ObjectMapper mapper = new ObjectMapper();
 	    ObjectNode node = mapper.createObjectNode();
