@@ -25,6 +25,8 @@ services:
     build: sftp
     ports:
       - "22:22"
+    volumes:
+      - /sftp/share:/home/foo/share
     networks:
       cmi_net:
         ipv4_address: 172.16.238.12
