@@ -34,7 +34,7 @@ public class EPointJDBC implements EPointDAO {
     public void addEPoint(EPoint epoint) throws SQLException {
 	//query of postgresql
 	String sql = "insert into epoints(ptag, etag, ebeam, mfield)"
-	    + "values (?,?,?,?,?)";
+	    + "values (?,?,?,?)";
 	
 	PreparedStatement ps = this.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 	
